@@ -1,36 +1,139 @@
-import React from 'react';
-import { Sparkles, ArrowRight, Zap } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Sparkles, ArrowRight, Zap, RefreshCw, Bot } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { generateCoachingInsight, generateCustomAIChallenge, getOpenAIApiKey } from '../services/aiService';
 
 export default function AIInsight() {
-  const { setCurrentPage, userProfile } = useApp();
+  const { setCurrentPage, userProfile, baselineMetrics, categoryData, addCustomChallenge } = useApp();
+  
+  const [insight, setInsight] = useState({
+    title: 'Your food spending spikes on busy weekdays.',
+    desc: `You're averaging ₹460 on weekday delivery, compared with ₹290 on your normal days. A ₹200 weekday cap could save roughly ₹3,400/month towards your ${userProfile.goalName || 'Emergency Fund'}.`,
+    isLive: false
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [isCreatingChallenge, setIsCreatingChallenge] = useState(false);
 
-  const handleTurnIntoChallenge = () => {
-    setCurrentPage('challenges');
+  const topCategory = categoryData && categoryData.length > 0
+    ? [...categoryData].sort((a, b) => b.value - a.value)[0]
+    : { name: 'Food & Dining', value: 32 };
+
+  const hasApiKey = Boolean(getOpenAIApiKey());
+
+  const fetchInsight = async () => {
+    setIsLoading(true);
+    try {
+      const res = await generateCoachingInsight({
+        userProfile,
+        baselineMetrics,
+        topCategory
+      });
+      setInsight(res);
+    } catch (e) {
+      console.error('Failed to generate insight:', e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchInsight();
+  }, [userProfile.goalName, userProfile.goalAmount]);
+
+  const handleTurnIntoChallenge = async () => {
+    setIsCreatingChallenge(true);
+    try {
+      const customChallenge = await generateCustomAIChallenge({
+        userProfile,
+        topCategory
+      });
+      addCustomChallenge(customChallenge);
+      setCurrentPage('challenges');
+    } catch (e) {
+      console.error('Failed to create challenge:', e);
+      setCurrentPage('challenges');
+    } finally {
+      setIsCreatingChallenge(false);
+    }
   };
 
   return (
     <div className="ai-insight-card">
-      <div>
-        <div className="ai-label-pill">
-          <Sparkles size={13} />
-          <span>AI PERSONALIZED INSIGHT</span>
+      <div style={{ flex: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+          <div className="ai-label-pill">
+            <Sparkles size={13} />
+            <span>AI PERSONALIZED INSIGHT</span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span
+              style={{
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                color: hasApiKey ? '#B9F36A' : 'rgba(255, 255, 255, 0.65)',
+                background: hasApiKey ? 'rgba(185, 243, 106, 0.12)' : 'rgba(255, 255, 255, 0.08)',
+                border: hasApiKey ? '1px solid rgba(185, 243, 106, 0.3)' : '1px solid rgba(255, 255, 255, 0.1)',
+                padding: '2px 8px',
+                borderRadius: 9999,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5
+              }}
+            >
+              <Bot size={11} />
+              {hasApiKey ? '⚡ OpenAI GPT-4o-mini' : '🤖 DhanMitra AI Coach'}
+            </span>
+
+            <button
+              onClick={fetchInsight}
+              disabled={isLoading}
+              title="Re-analyze with DhanMitra AI"
+              style={{
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: 'none',
+                color: '#FFFFFF',
+                borderRadius: '50%',
+                width: 26,
+                height: 26,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: isLoading ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              <RefreshCw size={13} style={{ animation: isLoading ? 'spin 1s linear infinite' : 'none' }} />
+            </button>
+          </div>
         </div>
 
-        <h3 className="ai-insight-title">Your food spending spikes on busy weekdays.</h3>
+        <h3 className="ai-insight-title" style={{ opacity: isLoading ? 0.6 : 1, transition: 'opacity 0.2s' }}>
+          {insight.title}
+        </h3>
 
-        <p className="ai-insight-desc">
-          You're averaging <strong>₹460</strong> on weekday delivery, compared with{' '}
-          <strong>₹290</strong> on your normal days. A ₹200 weekday cap could save roughly{' '}
-          <strong>₹3,400/month</strong> towards your {userProfile.goalName || 'Emergency Fund'}.
+        <p className="ai-insight-desc" style={{ opacity: isLoading ? 0.6 : 1, transition: 'opacity 0.2s' }}>
+          {insight.desc}
         </p>
       </div>
 
-      <button className="btn-ai-challenge" onClick={handleTurnIntoChallenge}>
+      <button
+        className="btn-ai-challenge"
+        onClick={handleTurnIntoChallenge}
+        disabled={isCreatingChallenge}
+        title="Automatically create and activate an AI micro-challenge from this insight"
+      >
         <Zap size={16} />
-        <span>Turn this into a challenge</span>
+        <span>{isCreatingChallenge ? 'Creating...' : 'Turn this into a challenge'}</span>
         <ArrowRight size={16} />
       </button>
+
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }

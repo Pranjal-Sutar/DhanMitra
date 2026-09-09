@@ -192,6 +192,22 @@ export function AppProvider({ children }) {
     ]);
   };
 
+  // Action: Add AI Generated Custom Challenge
+  const addCustomChallenge = (newChallenge) => {
+    setChallenges((prev) => [newChallenge, ...prev]);
+    setNotifications((prev) => [
+      {
+        id: `notif-${Date.now()}`,
+        title: '🤖 AI Habit Challenge Created!',
+        message: `DhanMitra AI created "${newChallenge.title}". Track it in Active Challenges!`,
+        time: 'Just now',
+        unread: true,
+        type: 'challenge'
+      },
+      ...prev
+    ]);
+  };
+
   // Action: Daily Check-in / Log +1 Day Progress
   const checkInChallengeDay = (challengeId) => {
     const today = new Date().toISOString().split('T')[0];
@@ -375,6 +391,7 @@ export function AppProvider({ children }) {
         categoryData,
         challenges,
         startChallenge,
+        addCustomChallenge,
         checkInChallengeDay,
         completeChallenge,
         rewards,

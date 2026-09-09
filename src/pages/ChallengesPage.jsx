@@ -1,17 +1,37 @@
-import React from 'react';
-import { Flame, Sparkles, CheckCircle2, Award, Zap, ArrowRight, Shield } from 'lucide-react';
+import React, { useState } from 'react';
+import { Flame, Sparkles, CheckCircle2, Award, Zap, ArrowRight, Shield, Bot } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import RewardsPanel from '../components/RewardsPanel';
 import ChallengeCard from '../components/ChallengeCard';
+import { generateCustomAIChallenge, getOpenAIApiKey } from '../services/aiService';
 
 export default function ChallengesPage() {
-  const { challenges, startChallenge } = useApp();
+  const { challenges, startChallenge, addCustomChallenge, userProfile, categoryData } = useApp();
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const hasApiKey = Boolean(getOpenAIApiKey());
+
+  const topCategory = categoryData && categoryData.length > 0
+    ? [...categoryData].sort((a, b) => b.value - a.value)[0]
+    : { name: 'Food & Dining', value: 32 };
 
   // Active challenges currently being tracked
   const activeChallenges = challenges.filter((c) => c.isActive);
 
   // Available in catalog (not yet activated)
   const availableChallenges = challenges.filter((c) => !c.isActive);
+
+  const handleGenerateAIChallenge = async () => {
+    setIsGenerating(true);
+    try {
+      const generated = await generateCustomAIChallenge({ userProfile, topCategory });
+      addCustomChallenge(generated);
+    } catch (e) {
+      console.error('Failed to generate challenge:', e);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   return (
     <div className="page-body">
@@ -92,13 +112,34 @@ export default function ChallengesPage() {
 
       {/* Available Challenges Catalog */}
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <h2 style={{ fontSize: '1.25rem', color: 'var(--forest-950)' }}>
-            Available Challenges Catalog
-          </h2>
-          <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-            Select any challenge to add it to your active list
-          </span>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
+          <div>
+            <h2 style={{ fontSize: '1.25rem', color: 'var(--forest-950)', marginBottom: 4 }}>
+              Available Challenges Catalog
+            </h2>
+            <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+              Select any challenge to add it to your active list or generate a new one with AI
+            </span>
+          </div>
+
+          {/* AI Generator Action Button */}
+          <button
+            className="btn-lime"
+            onClick={handleGenerateAIChallenge}
+            disabled={isGenerating}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '9px 18px',
+              fontSize: '0.85rem',
+              boxShadow: '0 4px 12px rgba(185, 243, 106, 0.25)'
+            }}
+            title={hasApiKey ? 'Generate tailored challenge with OpenAI GPT-4o-mini' : 'Generate with DhanMitra AI Coach'}
+          >
+            <Sparkles size={16} style={{ animation: isGenerating ? 'spin 1s linear infinite' : 'none' }} />
+            <span>{isGenerating ? 'AI Generating Challenge...' : '✨ Generate AI Habit Challenge'}</span>
+          </button>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20 }}>

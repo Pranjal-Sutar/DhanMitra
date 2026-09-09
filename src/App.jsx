@@ -9,6 +9,7 @@ import DashboardPage from './pages/DashboardPage';
 import SpendingPage from './pages/SpendingPage';
 import GoalsPage from './pages/GoalsPage';
 import ChallengesPage from './pages/ChallengesPage';
+import AICoachChat from './components/AICoachChat';
 
 import LoginScreen from './components/LoginScreen';
 
@@ -46,9 +47,10 @@ export default function App() {
         {/* Dynamic Route Content */}
         <main>{renderCurrentPage()}</main>
 
-        {/* Global Modals */}
+        {/* Global Modals & AI Floating Coach */}
         <CashSpendingModal />
         <OnboardingModal />
+        <AICoachChat />
       </div>
     </div>
   );
