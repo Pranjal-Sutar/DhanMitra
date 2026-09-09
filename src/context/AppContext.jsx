@@ -155,8 +155,9 @@ export function AppProvider({ children }) {
     setIsCashModalOpen(false);
   };
 
-  // Action: Start / Activate a challenge from catalog
+  // Action: Start / Activate a challenge from catalog (starts at Day 1 with real JSON log)
   const startChallenge = (challengeId) => {
+    const today = new Date().toISOString().split('T')[0];
     let startedTitle = 'Challenge';
     setChallenges((prev) =>
       prev.map((c) => {
@@ -165,7 +166,12 @@ export function AppProvider({ children }) {
           return {
             ...c,
             isActive: true,
-            isCompleted: false
+            isCompleted: false,
+            startDate: new Date().toISOString(),
+            completedDays: 1, // Fresh challenge starts at Day 1
+            dailyLog: [
+              { day: 1, date: today, status: 'on_track', spent: 0 }
+            ]
           };
         }
         return c;
@@ -177,13 +183,92 @@ export function AppProvider({ children }) {
       {
         id: `notif-${Date.now()}`,
         title: 'Challenge Started',
-        message: `Activated "${startedTitle}". Track it under Active Challenges!`,
+        message: `Activated "${startedTitle}" at Day 1. Check in daily to build streak!`,
         time: 'Just now',
         unread: true,
         type: 'challenge'
       },
       ...prev
     ]);
+  };
+
+  // Action: Daily Check-in / Log +1 Day Progress
+  const checkInChallengeDay = (challengeId) => {
+    const today = new Date().toISOString().split('T')[0];
+    let challengeTitle = 'Challenge';
+    let reward = 50;
+    let willComplete = false;
+
+    setChallenges((prev) =>
+      prev.map((c) => {
+        if (c.id === challengeId) {
+          challengeTitle = c.title;
+          reward = c.rewardCoins || 50;
+          const nextDay = Math.min(c.totalDays, (c.completedDays || 0) + 1);
+          willComplete = nextDay >= c.totalDays;
+
+          const updatedLog = [
+            ...(c.dailyLog || []),
+            { day: nextDay, date: today, status: 'on_track', spent: 0 }
+          ];
+
+          return {
+            ...c,
+            completedDays: nextDay,
+            dailyLog: updatedLog,
+            isCompleted: willComplete
+          };
+        }
+        return c;
+      })
+    );
+
+    if (willComplete) {
+      // Award coins and celebration
+      setRewards((prev) => {
+        const newStreak = prev.streak + 1;
+        return {
+          ...prev,
+          coins: prev.coins + reward,
+          streak: newStreak,
+          bestStreak: Math.max(prev.bestStreak, newStreak),
+          moneySaved: prev.moneySaved + reward * 10
+        };
+      });
+
+      setNotifications((prev) => [
+        {
+          id: `notif-${Date.now()}`,
+          title: 'Goal Achieved! 🏆',
+          message: `Finished all days for "${challengeTitle}"! Earned +${reward} coins!`,
+          time: 'Just now',
+          unread: true,
+          type: 'challenge'
+        },
+        ...prev
+      ]);
+
+      try {
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#B9F36A', '#10B981', '#F59E0B', '#7C3AED', '#07110D']
+        });
+      } catch (e) {}
+    } else {
+      setNotifications((prev) => [
+        {
+          id: `notif-${Date.now()}`,
+          title: 'Daily Progress Logged',
+          message: `Checked in day for "${challengeTitle}". Keep going!`,
+          time: 'Just now',
+          unread: true,
+          type: 'challenge'
+        },
+        ...prev
+      ]);
+    }
   };
 
   // Action: Complete Challenge with Confetti and Coin/Streak Boost
@@ -290,6 +375,7 @@ export function AppProvider({ children }) {
         categoryData,
         challenges,
         startChallenge,
+        checkInChallengeDay,
         completeChallenge,
         rewards,
         unlockSimulator,

@@ -29,12 +29,19 @@ export const INITIAL_CHALLENGES = [
     goal: "Keep delivery spending under ₹1,400 this week.",
     targetSpending: 1400,
     currentSpending: 980,
+    startDate: "2026-09-05T08:00:00.000Z",
     completedDays: 4,
     totalDays: 7,
     rewardCoins: 50,
     isActive: true,
     isCompleted: false,
-    aiTriggered: true
+    aiTriggered: true,
+    dailyLog: [
+      { day: 1, date: "2026-09-05", status: "on_track", spent: 180 },
+      { day: 2, date: "2026-09-06", status: "on_track", spent: 220 },
+      { day: 3, date: "2026-09-07", status: "on_track", spent: 290 },
+      { day: 4, date: "2026-09-08", status: "on_track", spent: 290 }
+    ]
   },
   {
     id: "challenge-home-cooking",
@@ -43,12 +50,14 @@ export const INITIAL_CHALLENGES = [
     goal: "Cook dinner at home on Saturday & Sunday.",
     targetSpending: 0,
     currentSpending: 0,
-    completedDays: 1,
+    startDate: null,
+    completedDays: 0,
     totalDays: 2,
     rewardCoins: 40,
     isActive: false,
     isCompleted: false,
-    aiTriggered: false
+    aiTriggered: false,
+    dailyLog: []
   },
   {
     id: "challenge-tea-cap",
@@ -56,13 +65,15 @@ export const INITIAL_CHALLENGES = [
     category: "Food & Dining",
     goal: "Keep daily small UPI tea & snack spends under ₹80/day.",
     targetSpending: 400,
-    currentSpending: 120,
-    completedDays: 2,
+    currentSpending: 0,
+    startDate: null,
+    completedDays: 0,
     totalDays: 5,
     rewardCoins: 35,
     isActive: false,
     isCompleted: false,
-    aiTriggered: false
+    aiTriggered: false,
+    dailyLog: []
   },
   {
     id: "challenge-commute-walk",
@@ -71,12 +82,14 @@ export const INITIAL_CHALLENGES = [
     goal: "Avoid auto/cab for trips under 1 km this week.",
     targetSpending: 0,
     currentSpending: 0,
-    completedDays: 1,
+    startDate: null,
+    completedDays: 0,
     totalDays: 4,
     rewardCoins: 45,
     isActive: false,
     isCompleted: false,
-    aiTriggered: false
+    aiTriggered: false,
+    dailyLog: []
   },
   {
     id: "challenge-subscription-audit",
@@ -85,12 +98,16 @@ export const INITIAL_CHALLENGES = [
     goal: "No e-commerce or unplanned shopping on weekdays.",
     targetSpending: 0,
     currentSpending: 0,
+    startDate: "2026-09-08T08:00:00.000Z",
     completedDays: 1,
     totalDays: 1,
     rewardCoins: 30,
     isActive: false,
     isCompleted: true,
-    aiTriggered: false
+    aiTriggered: false,
+    dailyLog: [
+      { day: 1, date: "2026-09-08", status: "on_track", spent: 0 }
+    ]
   }
 ];
 

@@ -3,7 +3,7 @@ import { Flame, CheckCircle2, Award, ArrowRight } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export default function ChallengeCard({ challenge, showNavigate = false }) {
-  const { completeChallenge, setCurrentPage } = useApp();
+  const { completeChallenge, checkInChallengeDay, setCurrentPage } = useApp();
 
   const activeChallenge = challenge || {
     id: 'challenge-food-delivery',
@@ -17,7 +17,7 @@ export default function ChallengeCard({ challenge, showNavigate = false }) {
 
   const pct = Math.min(
     100,
-    Math.round((activeChallenge.completedDays / activeChallenge.totalDays) * 100)
+    Math.round(((activeChallenge.completedDays || 0) / (activeChallenge.totalDays || 1)) * 100)
   );
 
   return (
@@ -38,13 +38,55 @@ export default function ChallengeCard({ challenge, showNavigate = false }) {
         <h3 className="challenge-title">{activeChallenge.title}</h3>
         <p className="challenge-goal">{activeChallenge.goal}</p>
 
+        {/* Visual Day Tracker Chips */}
+        <div style={{ display: 'flex', gap: 6, margin: '14px 0 14px 0', alignItems: 'center' }}>
+          {Array.from({ length: activeChallenge.totalDays }).map((_, i) => {
+            const isDone = i < (activeChallenge.completedDays || 0);
+            const isCurrent = i === (activeChallenge.completedDays || 0) && !activeChallenge.isCompleted;
+            return (
+              <div
+                key={i}
+                style={{
+                  flex: 1,
+                  height: 28,
+                  borderRadius: 6,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  background: isDone
+                    ? 'var(--forest-950)'
+                    : isCurrent
+                    ? 'var(--lime-light)'
+                    : 'var(--card-subtle)',
+                  color: isDone
+                    ? 'var(--lime-primary)'
+                    : isCurrent
+                    ? 'var(--forest-950)'
+                    : 'var(--text-muted)',
+                  border: isDone
+                    ? '1px solid rgba(185, 243, 106, 0.4)'
+                    : isCurrent
+                    ? '1.5px solid var(--lime-primary)'
+                    : '1px solid var(--border-light)',
+                  transition: 'all 0.2s ease'
+                }}
+                title={`Day ${i + 1}: ${isDone ? 'Completed' : isCurrent ? 'Today' : 'Upcoming'}`}
+              >
+                Day {i + 1} {isDone ? '✓' : ''}
+              </div>
+            );
+          })}
+        </div>
+
         {/* Progress bar */}
         <div className="challenge-progress-bar-wrap">
           <div className="challenge-progress-meta">
             <span>
               {activeChallenge.isCompleted
-                ? 'Completed!'
-                : `${activeChallenge.completedDays} / ${activeChallenge.totalDays} days on track`}
+                ? 'All Days Completed!'
+                : `${activeChallenge.completedDays || 0} / ${activeChallenge.totalDays} days on track`}
             </span>
             <span>{activeChallenge.isCompleted ? '100%' : `${pct}%`}</span>
           </div>
@@ -72,13 +114,27 @@ export default function ChallengeCard({ challenge, showNavigate = false }) {
             <span>Challenge Complete! (+{activeChallenge.rewardCoins} coins earned)</span>
           </div>
         ) : (
-          <button
-            className="btn-complete-challenge"
-            onClick={() => completeChallenge(activeChallenge.id)}
-          >
-            <Award size={18} />
-            <span>Complete challenge</span>
-          </button>
+          <div style={{ display: 'flex', gap: 10 }}>
+            {activeChallenge.completedDays < activeChallenge.totalDays && (
+              <button
+                className="btn-outline"
+                style={{ flex: 1, justifyContent: 'center', fontSize: '0.86rem' }}
+                onClick={() => checkInChallengeDay(activeChallenge.id)}
+                title="Log daily progress and advance +1 day"
+              >
+                <span>Check-in Day (+1)</span>
+              </button>
+            )}
+
+            <button
+              className="btn-complete-challenge"
+              style={{ flex: 1.2 }}
+              onClick={() => completeChallenge(activeChallenge.id)}
+            >
+              <Award size={18} />
+              <span>Complete challenge</span>
+            </button>
+          </div>
         )}
 
         {showNavigate && (
