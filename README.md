@@ -77,8 +77,8 @@ DhanMitra solves this by benchmarking you **against your own past self**:
 ## 🔑 Demo Access
 
 For hackathon evaluators and demo testing:
-- **Email / Username:** `pranjal@dhanmitra.ai` *(or `pranjal`)*
-- **Password:** `dhanmitra123`
+- **Email / Username:** `admin` *(or `admin@dhanmitra.ai`)*
+- **Password:** `password123` *(or `123`)*
 
 ---
 

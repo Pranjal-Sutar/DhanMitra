@@ -66,8 +66,8 @@ export function AppProvider({ children }) {
     const p = (pass || '').trim();
     // Hardcoded demo credentials
     if (
-      (u === 'pranjal' || u === 'pranjal@dhanmitra.ai' || u === 'pranjal@finly.ai') &&
-      (p === 'dhanmitra123' || p === 'finly123' || p === 'password123')
+      (u === 'admin' || u === 'admin@dhanmitra.ai') &&
+      (p === 'password123' || p === '123')
     ) {
       setIsAuthenticated(true);
       localStorage.setItem('finly_auth', 'true');
