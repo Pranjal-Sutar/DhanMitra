@@ -1,7 +1,5 @@
 // DhanMitra Live OpenAI Integration Service
 
-const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
-
 /**
  * Helper to retrieve API key from localStorage or Vite environment
  */
@@ -25,6 +23,62 @@ export function saveOpenAIApiKey(key) {
       localStorage.setItem('dhanmitra_openai_api_key', key.trim());
     }
   }
+}
+
+/**
+ * Robust fetch dispatcher:
+ * 1. Tries local Vite proxy (/api/openai/v1/chat/completions) to bypass browser CORS completely
+ * 2. Tries direct OpenAI endpoint (https://api.openai.com/v1/chat/completions)
+ */
+async function callOpenAI(messages, apiKey, { temperature = 0.7, max_tokens = 300 } = {}) {
+  const endpoints = [
+    '/api/openai/v1/chat/completions',
+    'https://api.openai.com/v1/chat/completions'
+  ];
+
+  let lastError = null;
+
+  for (const endpoint of endpoints) {
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages,
+          temperature,
+          max_tokens
+        })
+      });
+
+      if (!response.ok) {
+        let errMessage = response.statusText;
+        try {
+          const errData = await response.json();
+          errMessage = errData?.error?.message || response.statusText;
+        } catch (_) {}
+
+        if (response.status === 401) {
+          throw new Error(`Invalid API Key (401). Please check your key in .env or the 'Set Key' button.`);
+        } else if (response.status === 429) {
+          throw new Error(`OpenAI Quota / Rate Limit (429): ${errMessage}`);
+        } else {
+          throw new Error(`OpenAI HTTP ${response.status}: ${errMessage}`);
+        }
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      lastError = err;
+      console.warn(`DhanMitra AI endpoint ${endpoint} issue:`, err.message);
+    }
+  }
+
+  throw lastError || new Error('Network error connecting to OpenAI API');
 }
 
 /**
@@ -61,28 +115,15 @@ Only return valid JSON, no markdown formatting.
 `;
 
   try {
-    const response = await fetch(OPENAI_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: 'You are DhanMitra, a warm, intelligent AI financial coach.' },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.7,
-        max_tokens: 150
-      })
-    });
+    const data = await callOpenAI(
+      [
+        { role: 'system', content: 'You are DhanMitra, a warm, intelligent AI financial coach.' },
+        { role: 'user', content: prompt }
+      ],
+      apiKey,
+      { temperature: 0.7, max_tokens: 180 }
+    );
 
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.statusText}`);
-    }
-
-    const data = await response.json();
     const content = data.choices[0]?.message?.content?.trim();
     const cleaned = content.replace(/```json/g, '').replace(/```/g, '').trim();
     const parsed = JSON.parse(cleaned);
@@ -110,7 +151,7 @@ export async function askDhanMitraCoach(userQuestion, chatHistory = [], financia
   const apiKey = getOpenAIApiKey();
 
   if (!apiKey) {
-    return `⚠️ To enable live AI responses, add your OpenAI API key to the .env file (VITE_OPENAI_API_KEY=sk-...). 
+    return `⚠️ To enable live AI responses, add your OpenAI API key to .env (VITE_OPENAI_API_KEY=sk-...) or click the 'Set Key' button in the header.
 
 For now: Based on your numbers, you're projected to save ₹${(financialContext.projectedSavings || 20000).toLocaleString('en-IN')} this month. Capping weekday food delivery by ₹200 would speed up your ${financialContext.goalName || 'goal'} by nearly 3 weeks!`;
   }
@@ -129,7 +170,7 @@ User Financial Context:
 - Coins: ${financialContext.coins || 120}
 
 Instructions:
-- Keep your answers concise, practical, and empathetic (2-4 paragraphs maximum).
+- Keep your answers concise, practical, and empathetic (2-4 short paragraphs maximum).
 - Use ₹ Indian Rupee amounts.
 - Provide actionable micro-habits rather than telling the user to starve or cut off all fun.
 - If they ask if they can afford something, calculate the impact on their goal timeline.
@@ -137,34 +178,25 @@ Instructions:
 
   const messages = [
     { role: 'system', content: systemMessage },
-    ...chatHistory.slice(-6),
+    ...chatHistory.slice(-6).map((m) => ({ role: m.role, content: m.content })),
     { role: 'user', content: userQuestion }
   ];
 
   try {
-    const response = await fetch(OPENAI_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages,
-        temperature: 0.7,
-        max_tokens: 300
-      })
+    const data = await callOpenAI(messages, apiKey, {
+      temperature: 0.7,
+      max_tokens: 350
     });
 
-    if (!response.ok) {
-      throw new Error(`OpenAI error (${response.status})`);
-    }
-
-    const data = await response.json();
     return data.choices[0]?.message?.content || "I couldn't process that right now. Please try again.";
   } catch (error) {
     console.error("DhanMitra chat error:", error);
-    return `Could not connect to OpenAI API (${error.message}). Please check your API key in .env.`;
+    
+    // Provide an intelligent context-aware coach answer even if network encounters an issue
+    return `⚠️ (${error.message})
+
+Here is DhanMitra's calibrated coaching insight for your question:
+Based on your current savings (₹${(financialContext.currentSavings || 42000).toLocaleString('en-IN')}) and monthly target of ₹${(financialContext.projectedSavings || 20000).toLocaleString('en-IN')}, staying within your daily baseline this week protects your ${financialContext.streak || 4}-day streak and keeps you on pace for your ${financialContext.goalName || 'goal'}.`;
   }
 }
 
@@ -204,24 +236,15 @@ Return JSON only:
 `;
 
   try {
-    const response = await fetch(OPENAI_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: 'You are an AI financial coach designing habit challenges.' },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.8,
-        max_tokens: 150
-      })
-    });
+    const data = await callOpenAI(
+      [
+        { role: 'system', content: 'You are an AI financial coach designing habit challenges.' },
+        { role: 'user', content: prompt }
+      ],
+      apiKey,
+      { temperature: 0.8, max_tokens: 150 }
+    );
 
-    const data = await response.json();
     const content = data.choices[0]?.message?.content?.trim();
     const cleaned = content.replace(/```json/g, '').replace(/```/g, '').trim();
     const parsed = JSON.parse(cleaned);
