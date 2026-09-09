@@ -27,20 +27,57 @@ export function saveOpenAIApiKey(key) {
 
 /**
  * Robust fetch dispatcher:
- * 1. Tries local Vite proxy (/api/openai/v1/chat/completions) to bypass browser CORS completely
- * 2. Tries direct OpenAI endpoint (https://api.openai.com/v1/chat/completions)
+ * 1. Uses local Vite proxy (/api/openai/v1/chat/completions) to avoid browser CORS
+ * 2. Surfaces precise OpenAI error codes (401 Invalid Key, 429 Quota Exceeded, etc.)
  */
 async function callOpenAI(messages, apiKey, { temperature = 0.7, max_tokens = 300 } = {}) {
-  const endpoints = [
-    '/api/openai/v1/chat/completions',
-    'https://api.openai.com/v1/chat/completions'
-  ];
+  // Use Vite proxy first, or direct URL if proxy not present
+  const endpoint = '/api/openai/v1/chat/completions';
 
-  let lastError = null;
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages,
+        temperature,
+        max_tokens
+      })
+    });
 
-  for (const endpoint of endpoints) {
+    if (!response.ok) {
+      let errMessage = response.statusText;
+      let errCode = '';
+      try {
+        const errData = await response.json();
+        errMessage = errData?.error?.message || response.statusText;
+        errCode = errData?.error?.code || '';
+      } catch (_) {}
+
+      if (response.status === 401 || errCode === 'invalid_api_key') {
+        throw new Error(`Invalid API Key (401): The key provided was rejected by OpenAI. Please check or regenerate your key at platform.openai.com/api-keys.`);
+      } else if (response.status === 429) {
+        throw new Error(`OpenAI Rate Limit / Quota Exceeded (429): ${errMessage}`);
+      } else {
+        throw new Error(`OpenAI error (${response.status}): ${errMessage}`);
+      }
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    // If proxy failed with network error, try direct
+    if (err.message.includes('Invalid API Key') || err.message.includes('Quota Exceeded')) {
+      throw err;
+    }
+
+    console.warn("Proxy call failed, trying direct OpenAI endpoint...", err.message);
     try {
-      const response = await fetch(endpoint, {
+      const directResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,31 +91,20 @@ async function callOpenAI(messages, apiKey, { temperature = 0.7, max_tokens = 30
         })
       });
 
-      if (!response.ok) {
-        let errMessage = response.statusText;
+      if (!directResponse.ok) {
+        let errMessage = directResponse.statusText;
         try {
-          const errData = await response.json();
-          errMessage = errData?.error?.message || response.statusText;
+          const errData = await directResponse.json();
+          errMessage = errData?.error?.message || directResponse.statusText;
         } catch (_) {}
-
-        if (response.status === 401) {
-          throw new Error(`Invalid API Key (401). Please check your key in .env or the 'Set Key' button.`);
-        } else if (response.status === 429) {
-          throw new Error(`OpenAI Quota / Rate Limit (429): ${errMessage}`);
-        } else {
-          throw new Error(`OpenAI HTTP ${response.status}: ${errMessage}`);
-        }
+        throw new Error(`OpenAI (${directResponse.status}): ${errMessage}`);
       }
 
-      const data = await response.json();
-      return data;
-    } catch (err) {
-      lastError = err;
-      console.warn(`DhanMitra AI endpoint ${endpoint} issue:`, err.message);
+      return await directResponse.json();
+    } catch (directErr) {
+      throw err || directErr;
     }
   }
-
-  throw lastError || new Error('Network error connecting to OpenAI API');
 }
 
 /**
@@ -192,11 +218,10 @@ Instructions:
   } catch (error) {
     console.error("DhanMitra chat error:", error);
     
-    // Provide an intelligent context-aware coach answer even if network encounters an issue
-    return `⚠️ (${error.message})
+    return `⚠️ ${error.message}
 
-Here is DhanMitra's calibrated coaching insight for your question:
-Based on your current savings (₹${(financialContext.currentSavings || 42000).toLocaleString('en-IN')}) and monthly target of ₹${(financialContext.projectedSavings || 20000).toLocaleString('en-IN')}, staying within your daily baseline this week protects your ${financialContext.streak || 4}-day streak and keeps you on pace for your ${financialContext.goalName || 'goal'}.`;
+💡 **DhanMitra Calibrated Guidance:**
+Based on your monthly income of ₹${(financialContext.monthlyIncome || 52000).toLocaleString('en-IN')} and current savings of ₹${(financialContext.currentSavings || 42000).toLocaleString('en-IN')}, capping weekday discretionary leaks by ₹200/day will protect your ${financialContext.streak || 4}-day streak and reach your ${financialContext.goalName || 'Emergency Fund'} on schedule.`;
   }
 }
 
