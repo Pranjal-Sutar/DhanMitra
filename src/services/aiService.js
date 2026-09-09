@@ -3,12 +3,28 @@
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
 /**
- * Helper to retrieve API key from Vite environment
+ * Helper to retrieve API key from localStorage or Vite environment
  */
 export function getOpenAIApiKey() {
-  const key = import.meta.env.VITE_OPENAI_API_KEY || '';
-  if (!key || key === 'your_openai_api_key_here') return null;
-  return key.trim();
+  if (typeof window !== 'undefined') {
+    const localKey = localStorage.getItem('dhanmitra_openai_api_key');
+    if (localKey && localKey.trim()) return localKey.trim();
+  }
+
+  const envKey = import.meta.env.VITE_OPENAI_API_KEY || '';
+  if (envKey && envKey !== 'your_openai_api_key_here') return envKey.trim();
+
+  return null;
+}
+
+export function saveOpenAIApiKey(key) {
+  if (typeof window !== 'undefined') {
+    if (!key || !key.trim()) {
+      localStorage.removeItem('dhanmitra_openai_api_key');
+    } else {
+      localStorage.setItem('dhanmitra_openai_api_key', key.trim());
+    }
+  }
 }
 
 /**
