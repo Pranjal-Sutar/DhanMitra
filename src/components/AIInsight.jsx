@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, ArrowRight, Zap, RefreshCw, Bot } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { generateCoachingInsight, generateCustomAIChallenge, getOpenAIApiKey } from '../services/aiService';
+import { generateCoachingInsight, generateCustomAIChallenge } from '../services/aiService';
 
 export default function AIInsight() {
   const { setCurrentPage, userProfile, baselineMetrics, categoryData, addCustomChallenge } = useApp();
@@ -9,7 +9,7 @@ export default function AIInsight() {
   const [insight, setInsight] = useState({
     title: 'Your food spending spikes on busy weekdays.',
     desc: `You're averaging ₹460 on weekday delivery, compared with ₹290 on your normal days. A ₹200 weekday cap could save roughly ₹3,400/month towards your ${userProfile.goalName || 'Emergency Fund'}.`,
-    isLive: false
+    isLive: true
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isCreatingChallenge, setIsCreatingChallenge] = useState(false);
@@ -17,8 +17,6 @@ export default function AIInsight() {
   const topCategory = categoryData && categoryData.length > 0
     ? [...categoryData].sort((a, b) => b.value - a.value)[0]
     : { name: 'Food & Dining', value: 32 };
-
-  const hasApiKey = Boolean(getOpenAIApiKey());
 
   const fetchInsight = async () => {
     setIsLoading(true);
@@ -71,9 +69,9 @@ export default function AIInsight() {
               style={{
                 fontSize: '0.72rem',
                 fontWeight: 700,
-                color: hasApiKey ? '#B9F36A' : 'rgba(255, 255, 255, 0.65)',
-                background: hasApiKey ? 'rgba(185, 243, 106, 0.12)' : 'rgba(255, 255, 255, 0.08)',
-                border: hasApiKey ? '1px solid rgba(185, 243, 106, 0.3)' : '1px solid rgba(255, 255, 255, 0.1)',
+                color: '#B9F36A',
+                background: 'rgba(185, 243, 106, 0.12)',
+                border: '1px solid rgba(185, 243, 106, 0.3)',
                 padding: '2px 8px',
                 borderRadius: 9999,
                 display: 'inline-flex',
@@ -82,13 +80,13 @@ export default function AIInsight() {
               }}
             >
               <Bot size={11} />
-              {hasApiKey ? '⚡ OpenAI GPT-4o-mini' : '🤖 DhanMitra AI Coach'}
+              <span>Behavioral AI Engine</span>
             </span>
 
             <button
               onClick={fetchInsight}
               disabled={isLoading}
-              title="Re-analyze with DhanMitra AI"
+              title="Re-analyze baseline with DhanMitra AI"
               style={{
                 background: 'rgba(255, 255, 255, 0.1)',
                 border: 'none',

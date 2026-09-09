@@ -3,13 +3,11 @@ import { Flame, Sparkles, CheckCircle2, Award, Zap, ArrowRight, Shield, Bot } fr
 import { useApp } from '../context/AppContext';
 import RewardsPanel from '../components/RewardsPanel';
 import ChallengeCard from '../components/ChallengeCard';
-import { generateCustomAIChallenge, getOpenAIApiKey } from '../services/aiService';
+import { generateCustomAIChallenge } from '../services/aiService';
 
 export default function ChallengesPage() {
   const { challenges, startChallenge, addCustomChallenge, userProfile, categoryData } = useApp();
   const [isGenerating, setIsGenerating] = useState(false);
-
-  const hasApiKey = Boolean(getOpenAIApiKey());
 
   const topCategory = categoryData && categoryData.length > 0
     ? [...categoryData].sort((a, b) => b.value - a.value)[0]
@@ -135,7 +133,7 @@ export default function ChallengesPage() {
               fontSize: '0.85rem',
               boxShadow: '0 4px 12px rgba(185, 243, 106, 0.25)'
             }}
-            title={hasApiKey ? 'Generate tailored challenge with OpenAI GPT-4o-mini' : 'Generate with DhanMitra AI Coach'}
+            title="Generate personalized micro-challenge with DhanMitra AI Coach"
           >
             <Sparkles size={16} style={{ animation: isGenerating ? 'spin 1s linear infinite' : 'none' }} />
             <span>{isGenerating ? 'AI Generating Challenge...' : '✨ Generate AI Habit Challenge'}</span>

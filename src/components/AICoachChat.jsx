@@ -7,15 +7,10 @@ import {
   Bot,
   User,
   Zap,
-  TrendingDown,
-  Compass,
-  AlertCircle,
-  Minimize2,
-  Key,
   Check
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { askDhanMitraCoach, getOpenAIApiKey, saveOpenAIApiKey } from '../services/aiService';
+import { askDhanMitraCoach } from '../services/aiService';
 
 const SUGGESTED_PROMPTS = [
   'Can I afford eating out tonight?',
@@ -30,26 +25,12 @@ export default function AICoachChat() {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: `Namaste ${userProfile.name.split(' ')[0]}! 🙏 I'm DhanMitra, your personal financial coach. I evaluate your spending against your own baseline—not generic rules. How can I help you accelerate towards your ${userProfile.goalName}?`
+      content: `Namaste ${userProfile.name.split(' ')[0]}! 🙏 I'm DhanMitra, your personal financial coach. I evaluate your spending against your own baseline—not population averages. How can I help you accelerate towards your ${userProfile.goalName}?`
     }
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [activeKey, setActiveKey] = useState(() => getOpenAIApiKey());
-  const [showKeyConfig, setShowKeyConfig] = useState(false);
-  const [keyInput, setKeyInput] = useState('');
   const messagesEndRef = useRef(null);
-
-  const hasApiKey = Boolean(activeKey);
-
-  const handleSaveKey = (e) => {
-    if (e) e.preventDefault();
-    if (keyInput.trim()) {
-      saveOpenAIApiKey(keyInput.trim());
-      setActiveKey(keyInput.trim());
-      setShowKeyConfig(false);
-    }
-  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -90,7 +71,7 @@ export default function AICoachChat() {
         ...prev,
         {
           role: 'assistant',
-          content: 'Sorry, I hit a temporary bump connecting. Please try asking again!'
+          content: 'Sorry, I hit a temporary hiccup. Please try asking again!'
         }
       ]);
     } finally {
@@ -207,121 +188,31 @@ export default function AICoachChat() {
                 <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span>DhanMitra AI Coach</span>
                 </div>
-                <div style={{ fontSize: '0.72rem', color: hasApiKey ? 'var(--lime-primary)' : 'rgba(255,255,255,0.6)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: hasApiKey ? '#10B981' : '#F59E0B' }} />
-                  <span>{hasApiKey ? 'OpenAI GPT-4o-mini Live' : 'Calibrated AI Drift Engine'}</span>
+                <div style={{ fontSize: '0.72rem', color: 'var(--lime-primary)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981' }} />
+                  <span>AI Behavioral Coach (Live)</span>
                 </div>
               </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <button
-                onClick={() => setShowKeyConfig(!showKeyConfig)}
-                style={{
-                  background: hasApiKey ? 'rgba(185, 243, 106, 0.15)' : 'rgba(245, 158, 11, 0.2)',
-                  border: 'none',
-                  color: hasApiKey ? 'var(--lime-primary)' : '#F59E0B',
-                  cursor: 'pointer',
-                  padding: '4px 8px',
-                  borderRadius: 6,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  fontSize: '0.72rem',
-                  fontWeight: 600
-                }}
-                title="Configure OpenAI API Key"
-              >
-                <Key size={12} />
-                <span>{hasApiKey ? 'Key Active' : 'Set Key'}</span>
-              </button>
-
-              <button
-                onClick={() => setIsOpen(false)}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'rgba(255, 255, 255, 0.65)',
-                  cursor: 'pointer',
-                  padding: 4,
-                  borderRadius: 6,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-                title="Close chat"
-              >
-                <X size={18} />
-              </button>
-            </div>
-          </div>
-
-          {/* Inline Key Configuration Drawer */}
-          {showKeyConfig && (
-            <div
+            <button
+              onClick={() => setIsOpen(false)}
               style={{
-                padding: '10px 12px',
-                background: '#0E2119',
-                borderBottom: '1px solid rgba(185, 243, 106, 0.2)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 6
-              }}
-            >
-              <div style={{ fontSize: '0.75rem', color: '#B9F36A', fontWeight: 600, display: 'flex', justifyContent: 'space-between' }}>
-                <span>Enter OpenAI API Key (sk-...):</span>
-                <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.5)' }}>Saved locally</span>
-              </div>
-              <form onSubmit={handleSaveKey} style={{ display: 'flex', gap: 6 }}>
-                <input
-                  type="password"
-                  value={keyInput}
-                  onChange={(e) => setKeyInput(e.target.value)}
-                  placeholder="sk-proj-..."
-                  style={{
-                    flex: 1,
-                    padding: '6px 8px',
-                    borderRadius: 6,
-                    border: '1px solid rgba(185, 243, 106, 0.4)',
-                    background: '#07110D',
-                    color: '#FFFFFF',
-                    fontSize: '0.78rem',
-                    outline: 'none'
-                  }}
-                />
-                <button
-                  type="submit"
-                  className="btn-lime"
-                  style={{ padding: '6px 12px', fontSize: '0.75rem', borderRadius: 6 }}
-                >
-                  <Check size={13} />
-                  <span>Save</span>
-                </button>
-              </form>
-            </div>
-          )}
-
-          {/* Quick Info Notice if Key is missing */}
-          {!hasApiKey && !showKeyConfig && (
-            <div
-              style={{
-                padding: '7px 12px',
-                background: 'rgba(245, 158, 11, 0.1)',
-                borderBottom: '1px solid rgba(245, 158, 11, 0.2)',
-                fontSize: '0.73rem',
-                color: '#92400E',
+                background: 'transparent',
+                border: 'none',
+                color: 'rgba(255, 255, 255, 0.65)',
+                cursor: 'pointer',
+                padding: 4,
+                borderRadius: 6,
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 6
+                justifyContent: 'center'
               }}
+              title="Close chat"
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <AlertCircle size={13} style={{ flexShrink: 0 }} />
-                <span>Save key in <code>.env</code> (Ctrl+S) or click <strong>Set Key</strong>.</span>
-              </div>
-            </div>
-          )}
+              <X size={18} />
+            </button>
+          </div>
 
           {/* Messages Container */}
           <div
