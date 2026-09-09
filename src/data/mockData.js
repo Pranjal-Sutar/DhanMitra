@@ -32,6 +32,7 @@ export const INITIAL_CHALLENGES = [
     completedDays: 4,
     totalDays: 7,
     rewardCoins: 50,
+    isActive: true,
     isCompleted: false,
     aiTriggered: true
   },
@@ -42,9 +43,38 @@ export const INITIAL_CHALLENGES = [
     goal: "Cook dinner at home on Saturday & Sunday.",
     targetSpending: 0,
     currentSpending: 0,
-    completedDays: 2,
+    completedDays: 1,
     totalDays: 2,
     rewardCoins: 40,
+    isActive: false,
+    isCompleted: false,
+    aiTriggered: false
+  },
+  {
+    id: "challenge-tea-cap",
+    title: "Chai & Snacks UPI Cap",
+    category: "Food & Dining",
+    goal: "Keep daily small UPI tea & snack spends under ₹80/day.",
+    targetSpending: 400,
+    currentSpending: 120,
+    completedDays: 2,
+    totalDays: 5,
+    rewardCoins: 35,
+    isActive: false,
+    isCompleted: false,
+    aiTriggered: false
+  },
+  {
+    id: "challenge-commute-walk",
+    title: "Walk Short Distances",
+    category: "Transport",
+    goal: "Avoid auto/cab for trips under 1 km this week.",
+    targetSpending: 0,
+    currentSpending: 0,
+    completedDays: 1,
+    totalDays: 4,
+    rewardCoins: 45,
+    isActive: false,
     isCompleted: false,
     aiTriggered: false
   },
@@ -58,6 +88,7 @@ export const INITIAL_CHALLENGES = [
     completedDays: 1,
     totalDays: 1,
     rewardCoins: 30,
+    isActive: false,
     isCompleted: true,
     aiTriggered: false
   }

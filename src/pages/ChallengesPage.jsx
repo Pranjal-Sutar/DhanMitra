@@ -5,10 +5,13 @@ import RewardsPanel from '../components/RewardsPanel';
 import ChallengeCard from '../components/ChallengeCard';
 
 export default function ChallengesPage() {
-  const { challenges, completeChallenge } = useApp();
+  const { challenges, startChallenge } = useApp();
 
-  const activeChallenge = challenges.find((c) => c.id === 'challenge-food-delivery') || challenges[0];
-  const otherChallenges = challenges.filter((c) => c.id !== activeChallenge.id);
+  // Active challenges currently being tracked
+  const activeChallenges = challenges.filter((c) => c.isActive);
+
+  // Available in catalog (not yet activated)
+  const availableChallenges = challenges.filter((c) => !c.isActive);
 
   return (
     <div className="page-body">
@@ -35,7 +38,7 @@ export default function ChallengesPage() {
           Small wins compound.
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', maxWidth: 680 }}>
-          Complete measurable 7-day behavioural challenges, earn DhanMitra coins, protect your streak,
+          Complete measurable behavioural challenges, earn DhanMitra coins, protect your streak,
           and redirect drift back toward your primary goal.
         </p>
       </div>
@@ -43,37 +46,63 @@ export default function ChallengesPage() {
       {/* Rewards & Streak Overview Banner */}
       <RewardsPanel />
 
-      {/* Active 7-Day Challenge Showcase */}
+      {/* Active Habit Challenges Showcase (Stacked dynamically) */}
       <div style={{ marginBottom: 36 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-          <h2 style={{ fontSize: '1.25rem', color: 'var(--forest-950)' }}>
-            Active 7-Day Habit Challenge
-          </h2>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <h2 style={{ fontSize: '1.25rem', color: 'var(--forest-950)' }}>
+              Active Habit Challenges
+            </h2>
+            <span
+              style={{
+                fontFamily: 'Space Grotesk',
+                fontWeight: 700,
+                fontSize: '0.82rem',
+                background: 'var(--forest-950)',
+                color: 'var(--lime-primary)',
+                padding: '2px 8px',
+                borderRadius: 9999
+              }}
+            >
+              {activeChallenges.length} Active
+            </span>
+          </div>
+
           <span
             style={{
               fontSize: '0.74rem',
               fontWeight: 700,
               background: 'rgba(124, 58, 237, 0.1)',
               color: 'var(--purple-ai)',
-              padding: '2px 8px',
+              padding: '3px 10px',
               borderRadius: 9999
             }}
           >
-            AI Calibrated
+            Live Tracking
           </span>
         </div>
 
-        <ChallengeCard challenge={activeChallenge} />
+        {/* Stacked Active Challenge Cards */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          {activeChallenges.map((ch) => (
+            <ChallengeCard key={ch.id} challenge={ch} />
+          ))}
+        </div>
       </div>
 
-      {/* Other Weekly Challenges Catalog */}
+      {/* Available Challenges Catalog */}
       <div>
-        <h2 style={{ fontSize: '1.25rem', color: 'var(--forest-950)', marginBottom: 16 }}>
-          Available Challenges Catalog
-        </h2>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <h2 style={{ fontSize: '1.25rem', color: 'var(--forest-950)' }}>
+            Available Challenges Catalog
+          </h2>
+          <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+            Select any challenge to add it to your active list
+          </span>
+        </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20 }}>
-          {otherChallenges.map((item) => (
+          {availableChallenges.map((item) => (
             <div key={item.id} className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
@@ -99,7 +128,8 @@ export default function ChallengesPage() {
                       gap: 6,
                       color: 'var(--success)',
                       fontWeight: 600,
-                      fontSize: '0.85rem'
+                      fontSize: '0.85rem',
+                      padding: '8px 0'
                     }}
                   >
                     <CheckCircle2 size={16} />
@@ -107,9 +137,10 @@ export default function ChallengesPage() {
                   </div>
                 ) : (
                   <button
-                    className="btn-outline"
+                    className="btn-lime"
                     style={{ width: '100%', justifyContent: 'center' }}
-                    onClick={() => completeChallenge(item.id)}
+                    onClick={() => startChallenge(item.id)}
+                    title="Click to start and add to active challenges"
                   >
                     <Zap size={15} />
                     <span>Start Challenge (+{item.rewardCoins} coins)</span>

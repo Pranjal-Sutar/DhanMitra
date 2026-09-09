@@ -155,11 +155,47 @@ export function AppProvider({ children }) {
     setIsCashModalOpen(false);
   };
 
-  // Action: Complete Challenge with Confetti and Coin/Streak Boost
-  const completeChallenge = (challengeId) => {
+  // Action: Start / Activate a challenge from catalog
+  const startChallenge = (challengeId) => {
+    let startedTitle = 'Challenge';
     setChallenges((prev) =>
       prev.map((c) => {
         if (c.id === challengeId) {
+          startedTitle = c.title;
+          return {
+            ...c,
+            isActive: true,
+            isCompleted: false
+          };
+        }
+        return c;
+      })
+    );
+
+    // Push instant notification
+    setNotifications((prev) => [
+      {
+        id: `notif-${Date.now()}`,
+        title: 'Challenge Started',
+        message: `Activated "${startedTitle}". Track it under Active Challenges!`,
+        time: 'Just now',
+        unread: true,
+        type: 'challenge'
+      },
+      ...prev
+    ]);
+  };
+
+  // Action: Complete Challenge with Confetti and Coin/Streak Boost
+  const completeChallenge = (challengeId) => {
+    let reward = 50;
+    let title = 'Challenge';
+
+    setChallenges((prev) =>
+      prev.map((c) => {
+        if (c.id === challengeId) {
+          reward = c.rewardCoins || 50;
+          title = c.title;
           return {
             ...c,
             isCompleted: true,
@@ -170,17 +206,30 @@ export function AppProvider({ children }) {
       })
     );
 
-    // Boost coins (+50), increment streak (4 -> 5), increase money saved (+400)
+    // Boost coins (+reward), increment streak, increase money saved
     setRewards((prev) => {
       const newStreak = prev.streak + 1;
       return {
         ...prev,
-        coins: prev.coins + 50,
+        coins: prev.coins + reward,
         streak: newStreak,
         bestStreak: Math.max(prev.bestStreak, newStreak),
-        moneySaved: prev.moneySaved + 400
+        moneySaved: prev.moneySaved + reward * 10
       };
     });
+
+    // Push completion alert to notification bell
+    setNotifications((prev) => [
+      {
+        id: `notif-${Date.now()}`,
+        title: 'Challenge Completed! 🎉',
+        message: `You earned +${reward} DhanMitra coins for finishing "${title}"!`,
+        time: 'Just now',
+        unread: true,
+        type: 'challenge'
+      },
+      ...prev
+    ]);
 
     // Fire festive confetti
     try {
@@ -240,6 +289,7 @@ export function AppProvider({ children }) {
         timelineData,
         categoryData,
         challenges,
+        startChallenge,
         completeChallenge,
         rewards,
         unlockSimulator,

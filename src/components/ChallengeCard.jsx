@@ -26,7 +26,7 @@ export default function ChallengeCard({ challenge, showNavigate = false }) {
         <div className="challenge-top-tag">
           <span className="challenge-badge">
             <Flame size={13} style={{ color: '#D97706' }} />
-            <span>7-Day Behaviour Challenge</span>
+            <span>{activeChallenge.totalDays}-Day Habit Challenge</span>
           </span>
 
           <span className="challenge-reward-badge">

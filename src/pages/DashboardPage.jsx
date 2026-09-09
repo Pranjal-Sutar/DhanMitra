@@ -14,7 +14,15 @@ import TransactionList from '../components/TransactionList';
 export default function DashboardPage() {
   const { baselineMetrics, rewards, challenges } = useApp();
 
-  const activeChallenge = challenges.find((c) => c.id === 'challenge-food-delivery') || challenges[0];
+  // Pick first active challenge that isn't finished yet, or fallback to first active
+  const activeChallenge =
+    challenges.find((c) => c.isActive && !c.isCompleted) ||
+    challenges.find((c) => c.isActive) ||
+    challenges[0];
+
+  const driftText = `${Math.abs(baselineMetrics.currentDrift)}% ${
+    baselineMetrics.currentDrift <= 0 ? 'lower' : 'higher'
+  }`;
 
   return (
     <div className="page-body">
@@ -29,15 +37,15 @@ export default function DashboardPage() {
         <StatCard
           label="This Month"
           value={formatINR(baselineMetrics.thisMonthSpent)}
-          trendText="8% lower"
-          trendType="positive"
+          trendText={driftText}
+          trendType={baselineMetrics.currentDrift <= 0 ? 'positive' : 'negative'}
           subtext="vs baseline"
           icon={Calendar}
         />
         <StatCard
           label="Projected Savings"
           value={formatINR(baselineMetrics.projectedSavings)}
-          trendText="+₹2,400"
+          trendText={baselineMetrics.projectedSavings >= 20000 ? '+₹2,400' : 'On track'}
           trendType="positive"
           subtext="this month"
           icon={Wallet}

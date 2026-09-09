@@ -3,7 +3,7 @@ import { Sparkles, ArrowRight, Zap } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export default function AIInsight() {
-  const { setCurrentPage } = useApp();
+  const { setCurrentPage, userProfile } = useApp();
 
   const handleTurnIntoChallenge = () => {
     setCurrentPage('challenges');
@@ -22,7 +22,7 @@ export default function AIInsight() {
         <p className="ai-insight-desc">
           You're averaging <strong>₹460</strong> on weekday delivery, compared with{' '}
           <strong>₹290</strong> on your normal days. A ₹200 weekday cap could save roughly{' '}
-          <strong>₹3,400/month</strong> towards your Emergency Fund.
+          <strong>₹3,400/month</strong> towards your {userProfile.goalName || 'Emergency Fund'}.
         </p>
       </div>
 

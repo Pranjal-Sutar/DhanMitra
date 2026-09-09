@@ -35,6 +35,8 @@ export default function CategoryDonut() {
 
   const driftScore = calculatePriorityDriftScore(categoryData, userProfile.priorities);
 
+  const topCategory = [...categoryData].sort((a, b) => b.value - a.value)[0] || categoryData[0];
+
   return (
     <div className="chart-card">
       <div className="card-header-row">
@@ -107,9 +109,11 @@ export default function CategoryDonut() {
             Top Drift
           </div>
           <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.2rem', fontWeight: 700, color: '#07110D' }}>
-            32%
+            {topCategory.value}%
           </div>
-          <div style={{ fontSize: '0.68rem', color: '#7C3AED', fontWeight: 600 }}>Food & Dining</div>
+          <div style={{ fontSize: '0.68rem', color: topCategory.color, fontWeight: 600 }}>
+            {topCategory.name}
+          </div>
         </div>
       </div>
 
@@ -135,7 +139,7 @@ export default function CategoryDonut() {
         <div>
           <strong>Stated priority:</strong> "{userProfile.priorities[0] || 'Save more'}"
           <div style={{ marginTop: 2 }}>
-            Your biggest discretionary drift is <strong>weekday food delivery</strong> (32% of monthly spend).
+            Your biggest discretionary drift is <strong>{topCategory.name.toLowerCase()}</strong> ({topCategory.value}% of monthly spend).
           </div>
         </div>
       </div>
