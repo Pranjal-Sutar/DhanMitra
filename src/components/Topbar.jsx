@@ -20,7 +20,7 @@ export default function Topbar() {
       case 'spending':
         return 'Spending Baseline';
       case 'goals':
-        return 'Premium Goal Simulator';
+        return 'Goals & Forecast';
       case 'challenges':
         return 'Habit Challenges & Rewards';
       default:

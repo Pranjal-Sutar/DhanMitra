@@ -52,7 +52,7 @@ export default function GoalCard() {
           style={{ width: '100%', justifyContent: 'center' }}
           onClick={() => setCurrentPage('goals')}
         >
-          <span>Open simulator</span>
+          <span>View Goal</span>
           <ArrowUpRight size={16} />
         </button>
       </div>

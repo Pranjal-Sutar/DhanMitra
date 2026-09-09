@@ -13,7 +13,7 @@
 - **AI Personalized Insight**: Contextual anomaly detection identifying specific spending leaks (e.g. weekday food delivery spikes) with 1-click challenge conversion.
 - **7-Day Micro-Challenges**: Actionable habit challenges with progress tracking, coin rewards, and celebratory confetti animations upon completion.
 - **Compounding Habit Rewards**: DhanMitra Coins, Day Streaks, Personal Records, and Money Saved dashboard.
-- **Premium Goal Simulator**: Dynamic real-time calculation sliders for Income, Current Savings, Goal Target, and discretionary spending cuts with live *"Reach your goal ~X weeks sooner!"* forecasts.
+- **Goal Forecast & Planner**: Dynamic real-time calculation sliders for Income, Current Savings, Goal Target, and discretionary spending cuts with live *"Reach your goal ~X weeks sooner!"* forecasts.
 - **Bank & Cash Transaction System**: ~90 days of realistic Indian transaction data (Swiggy, Zomato, Blinkit, Zepto, Amazon, Rent, Salary ₹52,000, UPI) + a live **Add Cash Spending** modal that recalculates metrics in real time.
 - **Onboarding / Quick Personalisation**: Custom financial profile setup with multi-select priority pills.
 - **Fintech Aesthetic**: Deep forest green (`#07110D`), fresh lime (`#B9F36A`), and soft mint (`#E7F4ED`) theme with `Space Grotesk` and `DM Sans` typography.

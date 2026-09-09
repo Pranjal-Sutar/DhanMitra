@@ -28,7 +28,7 @@ export default function Sidebar() {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'spending', label: 'Spending Baseline', icon: TrendingUp },
-    { id: 'goals', label: 'Goal Simulator', icon: Target },
+    { id: 'goals', label: 'Goals', icon: Target },
     { id: 'challenges', label: 'Challenges', icon: Flame, badge: '+50' }
   ];
 

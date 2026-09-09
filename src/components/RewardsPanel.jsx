@@ -90,7 +90,7 @@ export default function RewardsPanel() {
             onClick={() => setCurrentPage('goals')}
             style={{ whiteSpace: 'nowrap' }}
           >
-            <span>Goal Simulator Unlocked</span>
+            <span>Goal Planner Unlocked</span>
             <ArrowRight size={16} />
           </button>
         ) : (
@@ -100,7 +100,7 @@ export default function RewardsPanel() {
             disabled={rewards.coins < 100}
             style={{ whiteSpace: 'nowrap', opacity: rewards.coins < 100 ? 0.6 : 1 }}
           >
-            <span>Unlock Premium Goal Simulator · 100 coins</span>
+            <span>Unlock Premium Goal Planner · 100 coins</span>
             <Sparkles size={16} />
           </button>
         )}

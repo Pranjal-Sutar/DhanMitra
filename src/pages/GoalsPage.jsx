@@ -143,7 +143,7 @@ export default function GoalsPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
               <Zap size={16} style={{ color: 'var(--forest-800)' }} />
               <span style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--forest-800)' }}>
-                Behaviour Simulation Variable
+                Behavioural Change Variable
               </span>
             </div>
 
