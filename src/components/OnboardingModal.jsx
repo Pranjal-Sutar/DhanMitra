@@ -99,7 +99,7 @@ export default function OnboardingModal() {
           </div>
           <h2 style={{ fontSize: '1.5rem', color: 'var(--forest-950)' }}>Quick Personalisation</h2>
           <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>
-            Tell Finly what matters to you so we can calculate your true Priority Drift.
+            Tell DhanMitra what matters to you so we can calculate your true Priority Drift.
           </p>
         </div>
 

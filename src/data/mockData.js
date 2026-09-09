@@ -75,7 +75,7 @@ export const INITIAL_NOTIFICATIONS = [
   {
     id: "notif-2",
     title: "Challenge Streak Protected",
-    message: "4 days in a row! 3 more days left to earn +50 Finly coins.",
+    message: "4 days in a row! 3 more days left to earn +50 DhanMitra coins.",
     time: "Yesterday",
     unread: true,
     type: "challenge"

@@ -101,7 +101,7 @@ export default function LoginScreen() {
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
             <h1 style={{ fontFamily: 'Space Grotesk', fontSize: '1.85rem', fontWeight: 700, color: 'var(--forest-950)' }}>
-              Finly
+              DhanMitra
             </h1>
             <span className="brand-tag" style={{ background: 'var(--mint-soft)', color: 'var(--forest-800)', border: '1px solid #C7E2D3' }}>
               AI COACH
@@ -151,7 +151,7 @@ export default function LoginScreen() {
                 style={{ paddingLeft: 38 }}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="pranjal@finly.ai"
+                placeholder="pranjal@dhanmitra.ai"
                 required
               />
             </div>
@@ -207,7 +207,7 @@ export default function LoginScreen() {
             }}
             disabled={isLoading}
           >
-            <span>{isLoading ? 'Authenticating...' : 'Sign In to Finly'}</span>
+            <span>{isLoading ? 'Authenticating...' : 'Sign In to DhanMitra'}</span>
             <ArrowRight size={16} />
           </button>
         </form>

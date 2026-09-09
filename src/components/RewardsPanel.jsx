@@ -29,7 +29,7 @@ export default function RewardsPanel() {
         </h2>
 
         <div className="rewards-stats-grid">
-          {/* Finly Coins */}
+          {/* DhanMitra Coins */}
           <div className="reward-stat-item">
             <div className="reward-stat-icon" style={{ background: 'rgba(245, 158, 11, 0.18)', color: '#F59E0B' }}>
               <Coins size={26} />
@@ -38,7 +38,7 @@ export default function RewardsPanel() {
               <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.5rem', fontWeight: 700, color: '#FFFFFF' }}>
                 {rewards.coins}
               </div>
-              <div style={{ fontSize: '0.78rem', color: '#9FB8AC' }}>Finly Coins</div>
+              <div style={{ fontSize: '0.78rem', color: '#9FB8AC' }}>DhanMitra Coins</div>
             </div>
           </div>
 

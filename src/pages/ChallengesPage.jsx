@@ -35,7 +35,7 @@ export default function ChallengesPage() {
           Small wins compound.
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', maxWidth: 680 }}>
-          Complete measurable 7-day behavioural challenges, earn Finly coins, protect your streak,
+          Complete measurable 7-day behavioural challenges, earn DhanMitra coins, protect your streak,
           and redirect drift back toward your primary goal.
         </p>
       </div>

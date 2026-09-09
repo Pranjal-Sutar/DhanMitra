@@ -60,7 +60,7 @@ export default function Topbar() {
         <div
           className="coin-pill"
           onClick={() => setCurrentPage('challenges')}
-          title="Finly Coins · Click to view rewards"
+          title="DhanMitra Coins · Click to view rewards"
         >
           <div className="coin-icon">
             <span>🪙</span>

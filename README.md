@@ -1,7 +1,7 @@
-# Finly — AI-Powered Personal Financial Coach
+# DhanMitra — AI-Powered Personal Financial Coach
 
 > **Philosophy: "YOU VS YOU"**  
-> Finly learns your historical spending baseline and detects when current behaviour starts drifting from your normal patterns — turning insights into 7-day micro-challenges that compound into massive financial goals.
+> DhanMitra learns your historical spending baseline and detects when current behaviour starts drifting from your normal patterns — turning insights into 7-day micro-challenges that compound into massive financial goals.
 
 ---
 
@@ -12,7 +12,7 @@
 - **Category Spending Pie Chart**: Interactive pie chart breakdown with hover tooltips and category percentage shares.
 - **AI Personalized Insight**: Contextual anomaly detection identifying specific spending leaks (e.g. weekday food delivery spikes) with 1-click challenge conversion.
 - **7-Day Micro-Challenges**: Actionable habit challenges with progress tracking, coin rewards, and celebratory confetti animations upon completion.
-- **Compounding Habit Rewards**: Finly Coins, Day Streaks, Personal Records, and Money Saved dashboard.
+- **Compounding Habit Rewards**: DhanMitra Coins, Day Streaks, Personal Records, and Money Saved dashboard.
 - **Premium Goal Simulator**: Dynamic real-time calculation sliders for Income, Current Savings, Goal Target, and discretionary spending cuts with live *"Reach your goal ~X weeks sooner!"* forecasts.
 - **Bank & Cash Transaction System**: ~90 days of realistic Indian transaction data (Swiggy, Zomato, Blinkit, Zepto, Amazon, Rent, Salary ₹52,000, UPI) + a live **Add Cash Spending** modal that recalculates metrics in real time.
 - **Onboarding / Quick Personalisation**: Custom financial profile setup with multi-select priority pills.
@@ -41,8 +41,8 @@ npm run build
 ---
 
 ## 🔑 Demo Credentials
-- **Username / Email:** `pranjal@finly.ai` *(or `pranjal`)*
-- **Password:** `finly123` *(or `password123`)*
+- **Username / Email:** `pranjal@dhanmitra.ai` *(or `pranjal`)*
+- **Password:** `dhanmitra123` *(or `finly123` / `password123`)*
 
 ---
 

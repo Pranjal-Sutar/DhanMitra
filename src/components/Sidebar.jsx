@@ -54,7 +54,7 @@ export default function Sidebar() {
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span className="brand-text">Finly</span>
+                <span className="brand-text">DhanMitra</span>
                 <span className="brand-tag">AI</span>
               </div>
               <div style={{ fontSize: '0.68rem', color: '#81A194', letterSpacing: '0.04em' }}>
@@ -111,7 +111,7 @@ export default function Sidebar() {
           <button
             className="sidebar-action-btn"
             onClick={() => {
-              if (window.confirm('Sign out from Finly?')) {
+              if (window.confirm('Sign out from DhanMitra?')) {
                 logout();
                 setIsMobileNavOpen(false);
               }
@@ -125,7 +125,7 @@ export default function Sidebar() {
           <button
             className="sidebar-action-btn"
             onClick={() => {
-              if (window.confirm('Reset Finly to default hackathon demo state?')) {
+              if (window.confirm('Reset DhanMitra to default hackathon demo state?')) {
                 resetDemoData();
               }
             }}
